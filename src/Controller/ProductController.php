@@ -7,7 +7,9 @@ namespace Controller;
 use Framework\Render;
 use Service\Order\Basket;
 use Service\Product\Product;
-use Service\SocialNetwork\ISocialNetwork;
+use Service\Product\SortDefault;
+use Service\Product\SortName;
+use Service\Product\SortPrice;
 use Service\SocialNetwork\SocialNetwork;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,8 +53,16 @@ class ProductController
      */
     public function listAction(Request $request): Response
     {
-        $productList = (new Product())->getAll($request->query->get('sort', ''));
-
+//        $productList = (new Product())->getAll($request->query->get('sort', ''));
+        $strategy = $request->query->get('sort','');
+        if($strategy === 'name'){
+            $productList = (new Product())->getAll(new SortName());
+        }else if($strategy === 'price'){
+            $productList = (new Product())->getAll(new SortPrice());
+        }
+        else{
+            $productList = (new Product())->getAll(new SortDefault());
+        }
         return $this->render('product/list.html.php', ['productList' => $productList]);
     }
 
